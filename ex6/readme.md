@@ -1,5 +1,14 @@
 ex6
 
+# Band gaps
+
+| Band gap (eV) | Si | GaAs | InAs |
+|---|---:|---:|---:|
+| PBE noSOC | 0.559 | 0.500 | 0.000 |
+| PBE withSOC | 0.543 | 0.391 | 0.000 |
+| HSE noSOC | 1.149 | 1.324 | 0.403 |
+| HSE withSOC | 1.133 | 1.214 | 0.285 |
+
 
 # SCF runtimes
 
@@ -10,7 +19,7 @@ ex6
 | HSE noSOC | 3.97 | 24.29 | 44.64 |
 | HSE withSOC | 10.64 | 48.48 | 91.95 |
 
-SCF summaries
+# SCF summaries
 
 ## InAs
 ```text
