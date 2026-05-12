@@ -12,8 +12,8 @@ ex6
 
 SCF summaries
 
-##InAs
-'''bash
+## InAs
+```text
 HSE noSOC
 :ENE  : ********** TOTAL ENERGY IN Ry =       -16288.40462968
 :FER  : F E R M I - ENERGY(TETRAH.M.)=   0.3281783686
@@ -25,10 +25,10 @@ HSE withSOC
 :FER  : F E R M I - ENERGY(TETRAH.M.)=   0.3365936983
 :BAN00039:  39    0.678256    0.737761  0.00000000
 :GAP (this spin):  0.020982 Ry =     0.285 eV (accurate value if proper k-mesh)
-'''
+```
 
-##Si
-'''bash
+## Si
+```text
 HSE noSOC
 :ENE  : ********** TOTAL ENERGY IN Ry =        -1160.31936449
 :FER  : F E R M I - ENERGY(TETRAH.M.)=   0.3837810870
@@ -40,10 +40,10 @@ HSE withSOC
 :FER  : F E R M I - ENERGY(TETRAH.M.)=   0.3849502786
 :BAN00013:  13    0.626944    0.692885  0.00000000
 :GAP (this spin):  0.083311 Ry =     1.133 eV (accurate value if proper k-mesh)
-'''
+```
 
-##GaAs
-'''bash
+## GaAs
+```text
 HSE noSOC
 :ENE  : ********** TOTAL ENERGY IN Ry =        -8410.10766100
 :FER  : F E R M I - ENERGY(TETRAH.M.)=   0.3371081878
@@ -55,4 +55,4 @@ HSE withSOC
 :FER  : F E R M I - ENERGY(TETRAH.M.)=   0.3451244400
 :BAN00033:  33    0.672007    0.744187  0.00000000
 :GAP (this spin):  0.089240 Ry =     1.214 eV (accurate value if proper k-mesh)
-'''
+```
