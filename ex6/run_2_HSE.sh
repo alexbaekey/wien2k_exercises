@@ -3,28 +3,20 @@ set -e
 
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-CASE_LIST="Si GaAs InAs"
+CASE_LIST="InAs Si GaAs"
+#CASE_LIST="InAs"
+#CASE_LIST="Si"
+#CASE_LIST="GaAs"
+
+#NOTE need to check that EMAX is 5 when prompted
+# need to manually write n_x, n_y, n_z=5
 
 CC="0.00001"
 EC="0.00001"
 
-PATCH_NBAND="$BASE_DIR/patch_inhf_nband.py"
-PATCH_EMAX="$BASE_DIR/patch_emax_5.py"
-
 ##### HSE run commands #####
 HF_NOSOC_CMD="run_lapw -hf"
 HF_SOC_CMD="run_lapw -hf -so"
-
-##### step 1: check helper scripts #####
-if [ ! -f "$PATCH_NBAND" ]; then
-    echo "ERROR: missing $PATCH_NBAND"
-    exit 1
-fi
-
-if [ ! -f "$PATCH_EMAX" ]; then
-    echo "ERROR: missing $PATCH_EMAX"
-    exit 1
-fi
 
 ##### step 2: recreate HSE directories #####
 rm -rf "$BASE_DIR/3_HSE_noSOC"
@@ -32,77 +24,6 @@ rm -rf "$BASE_DIR/4_HSE_SOC"
 
 mkdir -p "$BASE_DIR/3_HSE_noSOC"
 mkdir -p "$BASE_DIR/4_HSE_SOC"
-
-##### helper: get occupied band number from :BAN lines #####
-get_nb_occ() {
-    local scf_file="$1"
-
-    if [ ! -f "$scf_file" ]; then
-        echo "ERROR: missing $scf_file"
-        exit 1
-    fi
-
-    local nb
-    nb=$(awk '
-    /^:BAN/ {
-        occ = $5
-        if (occ > 0.000001) {
-            band = $2
-        }
-    }
-    END {
-        if (band != "") print band
-    }
-    ' "$scf_file")
-
-    if [ -z "$nb" ]; then
-        echo "ERROR: could not extract occupied band count from $scf_file"
-        echo "Check with:"
-        echo "grep ':BAN' $scf_file"
-        exit 1
-    fi
-
-    echo "$nb"
-}
-
-##### helper: patch nband in case.inhf #####
-patch_inhf_nband() {
-    local case="$1"
-    local nband="$2"
-    local file="${case}.inhf"
-
-    if [ ! -f "$file" ]; then
-        echo "ERROR: missing $file"
-        echo "init_hf_lapw did not create it, or the filename is different."
-        exit 1
-    fi
-
-    cp "$file" "${file}_before_nband_patch"
-
-    python3 "$PATCH_NBAND" "$file" "$nband"
-
-    echo ""
-    echo "Current nband line in $file:"
-    grep -ni "nband" "$file" || true
-}
-
-##### helper: patch emax to 5.0 #####
-patch_emax_5() {
-    local file="$1"
-
-    if [ ! -f "$file" ]; then
-        echo "WARNING: missing $file, skipping emax patch for this file"
-        return
-    fi
-
-    cp "$file" "${file}_before_emax_patch"
-
-    python3 "$PATCH_EMAX" "$file"
-
-    echo ""
-    echo "Current EMIN/EMAX lines in $file:"
-    grep -ni "emax\|emin" "$file" || true
-}
 
 ##### helper: pause for verification #####
 pause_check() {
@@ -114,7 +35,6 @@ pause_check() {
 
 ##### step 3: loop over materials #####
 for CASE in $CASE_LIST; do
-
     PBE_NOSOC_DIR="$BASE_DIR/1_PBE_noSOC/$CASE/$CASE"
     PBE_SOC_DIR="$BASE_DIR/2_PBE_SOC/$CASE/$CASE"
 
@@ -136,19 +56,18 @@ for CASE in $CASE_LIST; do
         exit 1
     fi
 
-    ##### step 5: get noSOC NB_occ and nband #####
-    NB_OCC_NOSOC=$(get_nb_occ "$PBE_NOSOC_SCF")
-    NBAND_NOSOC=$((NB_OCC_NOSOC + 2))
-
-    echo "PBE noSOC NB_occ = $NB_OCC_NOSOC"
-    echo "HSE noSOC nband  = $NBAND_NOSOC"
-
     ##### step 6: copy converged PBE noSOC to HSE noSOC #####
     mkdir -p "$BASE_DIR/3_HSE_noSOC/$CASE"
     cp -r "$PBE_NOSOC_DIR" "$HSE_NOSOC_DIR"
 
     ##### step 7: go into HSE noSOC directory #####
     cd "$HSE_NOSOC_DIR"
+
+    rm -f .lcore
+    rm -f *.broyd* *.error
+    rm -f "${CASE}.clmcor"
+
+    x lcore 
 
     ##### step 8: initialize HSE noSOC #####
     echo ""
@@ -161,15 +80,6 @@ for CASE in $CASE_LIST; do
     echo "  5"
     echo "  5"
     init_hf_lapw
-
-    ##### step 9: patch HSE noSOC input files #####
-    patch_inhf_nband "$CASE" "$NBAND_NOSOC"
-
-    #if [ -f "${CASE}.in1c" ]; then
-    #    patch_emax_5 "${CASE}.in1c"
-    #else
-    #    patch_emax_5 "${CASE}.in1"
-    #fi
 
     ##### step 10: verify HSE noSOC files before running #####
     echo ""
@@ -206,8 +116,8 @@ for CASE in $CASE_LIST; do
     {
         echo "$CASE HSE noSOC"
         echo ""
-        echo "NB_occ from PBE noSOC = $NB_OCC_NOSOC"
-        echo "nband used = $NBAND_NOSOC"
+        #echo "NB_occ from PBE noSOC = $NB_OCC_NOSOC"
+        #echo "nband used = $NBAND_NOSOC"
         echo ""
         echo "total energy"
         grep ':ENE' "${CASE}.scf" | tail -1 || true
@@ -236,11 +146,7 @@ for CASE in $CASE_LIST; do
     fi
 
     ##### step 14: get SOC NB_occ and nband #####
-    NB_OCC_SOC=$(get_nb_occ "$PBE_SOC_SCF")
-    NBAND_SOC=$((NB_OCC_SOC + 2))
-
-    echo "PBE SOC NB_occ = $NB_OCC_SOC"
-    echo "HSE SOC nband  = $NBAND_SOC"
+    # check case.scf in 1_scf/, search BAN, then write # bands to be 2 more than # occupied
 
     ##### step 15: copy converged HSE noSOC to HSE SOC #####
     mkdir -p "$BASE_DIR/4_HSE_SOC/$CASE"
@@ -258,21 +164,6 @@ for CASE in $CASE_LIST; do
     echo "For spin-polarized case, answer N."
     init_so_lapw
 
-    ##### step 18: DO NOT run init_hf_lapw again #####
-    ##### case.inhf already exists because this directory was copied from HSE noSOC. #####
-    ##### Just patch nband for the SOC calculation. #####
-
-    ##### step 19: patch HSE SOC input files #####
-    patch_inhf_nband "$CASE" "$NBAND_SOC"
-
-    #if [ -f "${CASE}.in1c" ]; then
-    #    patch_emax_5 "${CASE}.in1c"
-    #else
-    #    patch_emax_5 "${CASE}.in1"
-    #fi
-
-    patch_emax_5 "${CASE}.inso"
-
     ##### step 20: verify HSE SOC files before running #####
     echo ""
     echo "Important HSE SOC checks for $CASE:"
@@ -286,6 +177,14 @@ for CASE in $CASE_LIST; do
     grep -ni "emax\|emin" "${CASE}.inso" 2>/dev/null || true
 
     pause_check
+
+    rm -f .lcore
+    rm -f *.broyd* *.error
+    rm -f "${CASE}.clmcor"
+
+    x lcore
+
+
 
     ##### step 21: run HSE with SOC #####
     echo ""
@@ -311,8 +210,8 @@ for CASE in $CASE_LIST; do
     {
         echo "$CASE HSE withSOC"
         echo ""
-        echo "NB_occ from PBE SOC = $NB_OCC_SOC"
-        echo "nband used = $NBAND_SOC"
+        #echo "NB_occ from PBE SOC = $NB_OCC_SOC"
+        #echo "nband used = $NBAND_SOC"
         echo ""
         echo "total energy"
         grep ':ENE' "${CASE}.scf" | tail -1 || true
