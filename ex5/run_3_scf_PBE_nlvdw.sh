@@ -81,7 +81,7 @@ for D in $D_LIST; do
     cat "${CASE}.innlvdw"
 
     ##### step 11: run SCF with nlvdw #####
-    run_lapw -nlvdw -cc 0.00001 -ec 0.00001
+    run_lapw -p -nlvdw -cc 0.00001 -ec 0.00001
 
     ##### step 12: print run info #####
     echo "total energy"

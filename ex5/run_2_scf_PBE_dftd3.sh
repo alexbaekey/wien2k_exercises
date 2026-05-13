@@ -16,6 +16,7 @@ for D in $D_LIST; do
     SRC_DIR="$BASE_DIR/1_scf_PBE/d_${D}/$CASE"
     RUN_DIR="$BASE_DIR/2_scf_PBE_dftd3/d_${D}/$CASE"
 
+
     echo ""
     echo "=========================================="
     echo "Running PBE+dftd3 for d = $D A"
@@ -36,7 +37,7 @@ for D in $D_LIST; do
     cd "$RUN_DIR"
 
     ##### step 6: run SCF with dftd3 #####
-    run_lapw -dftd3 -cc 0.00001 -ec 0.00001
+    run_lapw -p -dftd3 -cc 0.00001 -ec 0.00001
 
     ##### step 7: print run info #####
     echo "total energy"

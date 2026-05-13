@@ -45,6 +45,8 @@ for CASE in $CASE_LIST; do
     ##### step 5: copy struct file #####
     cp "$STRUCT_FILE" "$NOSOC_DIR/${CASE}.struct"
 
+    cp $BASE_DIR/.machines $NOSOC_DIR
+
     ##### step 6: go into noSOC directory #####
     cd "$NOSOC_DIR"
 
@@ -77,7 +79,7 @@ for CASE in $CASE_LIST; do
     #x dstart
 
     ##### step 12: run noSOC SCF #####
-    run_lapw -cc "$CC" -ec "$EC"
+    run_lapw -p -cc "$CC" -ec "$EC"
 
     ##### step 13: print noSOC info #####
     echo ""
@@ -129,7 +131,7 @@ for CASE in $CASE_LIST; do
     init_so_lapw
 
     ##### step 18: run SOC SCF #####
-    run_lapw -so -cc "$CC" -ec "$EC"
+    run_lapw -p -so -cc "$CC" -ec "$EC"
 
     ##### step 19: print SOC info #####
     echo ""

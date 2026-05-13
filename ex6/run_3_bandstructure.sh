@@ -107,7 +107,7 @@ for CASE in $CASE_LIST; do
     #    sed -i "s/x.xxxx/${EF}/" "${CASE}.insp" || true
     #fi
 
-    x spaghetti -so
+    x spaghetti -p -so
 
     ##### step 11: copy PBE outputs #####
     cp "${CASE}.insp" "$RESULTS_DIR/${CASE}_PBE_SOC.insp" 2>/dev/null || true
@@ -147,7 +147,7 @@ for CASE in $CASE_LIST; do
     #    sed -i "s/x.xxxx/${EF}/" "${CASE}.insp" || true
     #fi
 
-    x spaghetti -so -hf
+    x spaghetti -p -so -hf
 
     ##### step 15: copy HSE outputs #####
     cp "${CASE}.insp" "$RESULTS_DIR/${CASE}_HSE_SOC.insp" 2>/dev/null || true

@@ -37,6 +37,8 @@ for D in $D_LIST; do
     ##### step 5: copy struct file into calculation directory #####
     cp "$STRUCT_FILE" "$RUN_DIR/${CASE}.struct"
 
+    cp $BASE_DIR/.machines $RUN_DIR
+
     ##### step 6: go into run directory #####
     cd "$RUN_DIR"
 
@@ -93,7 +95,7 @@ for D in $D_LIST; do
     grep -n "TEMP\|TETRA\|GAUSS" "${CASE}.in2"
 
     ##### step 13: run SCF #####
-    run_lapw -cc 0.00001 -ec 0.00001
+    run_lapw -p -cc 0.00001 -ec 0.00001
 
     ##### step 14: print run info #####
     echo "total energy"

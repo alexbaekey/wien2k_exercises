@@ -55,9 +55,13 @@ def quadratic_fit(d, e, label):
 def plot_one(filename, label):
     d, e = read_data(filename)
 
-    ##### shift each curve by its own calculated minimum #####
-    e_min = np.min(e)
-    e_shift = e - e_min
+    ##### shift each curve so the largest-distance point has energy 0 #####
+    e_ref = e[-1]
+    d_ref = d[-1]
+    e_shift = e - e_ref
+
+    print(f"{label}: reference point is d = {d_ref:.6f} A, E = {e_ref:.10f} Ry")
+    print(f"{label}: shifted so E(d_max) = 0")
 
     ##### plot calculated points #####
     line, = plt.plot(
@@ -71,11 +75,11 @@ def plot_one(filename, label):
 
     color = line.get_color()
 
-    ##### global quadratic fit #####
+    ##### global quadratic fit using original unshifted energies #####
     d_fit, e_fit, p = quadratic_fit(d, e, label)
 
-    ##### shift fitted curve by same energy minimum #####
-    e_fit_shift = e_fit - e_min
+    ##### shift fitted curve by same largest-distance reference energy #####
+    e_fit_shift = e_fit - e_ref
 
     ##### plot fitted curve across full sampled range #####
     plt.plot(
@@ -88,6 +92,7 @@ def plot_one(filename, label):
         label=f"{label} quadratic fit",
     )
 
+
 ##### step 5: make plot #####
 for filename, label in DATASETS:
     plot_one(filename, label)
@@ -95,7 +100,7 @@ for filename, label in DATASETS:
 
 ##### step 6: decorate plot #####
 plt.xlabel("Interlayer distance d (A)")
-plt.ylabel("Energy - minimum energy (Ry)")
+plt.ylabel("Energy - energy at largest d (Ry)")
 plt.title("Bilayer graphene interlayer distance")
 plt.legend(fontsize=8)
 plt.grid(True)

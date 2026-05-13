@@ -14,10 +14,6 @@ CASE_LIST="InAs Si GaAs"
 CC="0.00001"
 EC="0.00001"
 
-##### HSE run commands #####
-HF_NOSOC_CMD="run_lapw -hf"
-HF_SOC_CMD="run_lapw -hf -so"
-
 ##### step 2: recreate HSE directories #####
 rm -rf "$BASE_DIR/3_HSE_noSOC"
 rm -rf "$BASE_DIR/4_HSE_SOC"
@@ -60,6 +56,8 @@ for CASE in $CASE_LIST; do
     mkdir -p "$BASE_DIR/3_HSE_noSOC/$CASE"
     cp -r "$PBE_NOSOC_DIR" "$HSE_NOSOC_DIR"
 
+    cp $BASE_DIR/.machines $HSE_NOSOC_DIR
+
     ##### step 7: go into HSE noSOC directory #####
     cd "$HSE_NOSOC_DIR"
 
@@ -95,7 +93,7 @@ for CASE in $CASE_LIST; do
     ##### step 11: run HSE noSOC #####
     echo ""
     echo "Running HSE noSOC for $CASE"
-    $HF_NOSOC_CMD -cc "$CC" -ec "$EC"
+    run_lapw -hf -p -cc "$CC" -ec "$EC"
 
     ##### step 12: print HSE noSOC info #####
     echo ""
@@ -152,6 +150,8 @@ for CASE in $CASE_LIST; do
     mkdir -p "$BASE_DIR/4_HSE_SOC/$CASE"
     cp -r "$HSE_NOSOC_DIR" "$HSE_SOC_DIR"
 
+    cp $BASE_DIR/.machines $HSE_SOC_DIR
+
     ##### step 16: go into HSE SOC directory #####
     cd "$HSE_SOC_DIR"
 
@@ -185,11 +185,10 @@ for CASE in $CASE_LIST; do
     x lcore
 
 
-
     ##### step 21: run HSE with SOC #####
     echo ""
     echo "Running HSE withSOC for $CASE"
-    $HF_SOC_CMD -cc "$CC" -ec "$EC"
+    run_lapw -hf -so -p -cc "$CC" -ec "$EC"
 
     ##### step 22: print HSE SOC info #####
     echo ""
