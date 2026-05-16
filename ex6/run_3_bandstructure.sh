@@ -7,7 +7,7 @@ BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 CASE_LIST="Si GaAs InAs"
 
 ##### change this path if needed #####
-XCRYSDEN="$HOME/Desktop/ucf_research/PauloLab/ab_DFT_tutorial_Paulo/ex2/xcrysden-1.6.2/xcrysden"
+XCRYSDEN="/opt/xcrysden-1.6.2/xcrysden"
 
 ##### source converged SOC calculations #####
 PBE_SOC_BASE="$BASE_DIR/2_PBE_SOC"

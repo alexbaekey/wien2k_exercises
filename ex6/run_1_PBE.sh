@@ -6,7 +6,6 @@ BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 CASE_LIST="Si GaAs InAs"
 
 ##### calculation parameters #####
-VXC="13"          # PBE
 ECUT="-6.0"       # core/valence separation energy
 RKMAX="7.0"
 CC="0.00001"
@@ -62,7 +61,7 @@ for CASE in $CASE_LIST; do
     fi
 
     ##### step 9: initialize PBE noSOC calculation #####
-    init_lapw -b -vxc "$VXC" -ecut "$ECUT" -rkmax "$RKMAX" -numk 125
+    init_lapw -b -ecut "$ECUT" -rkmax "$RKMAX" -numk 125
 
     ##### step 10: overwrite k-mesh with exact 5 x 5 x 5 grid #####
     ##### Important: do not include an extra final 0 here.

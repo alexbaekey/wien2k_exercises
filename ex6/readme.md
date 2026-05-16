@@ -10,7 +10,7 @@ ex6
 | HSE withSOC | 1.133 | 1.214 | 0.285 |
 
 
-# SCF runtimes
+# SCF runtimes (no parallelization)
 
 | SCF time (minutes) | Si | GaAs | InAs |
 |---|---:|---:|---:|
